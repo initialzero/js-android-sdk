@@ -7,8 +7,8 @@ highlighter: rouge
 logo: false
 paginate: 15
 
-#baseurl: ""
-url: "http://jaspersoft.github.io/js-android-sdk/"
+baseurl: "/js-android-sdk"
+url: "http://jaspersoft.github.io"
 
 # Details for the RSS feed generator
 url:            'http://jaspersoft.github.io/js-android-sdk'
