@@ -10,8 +10,6 @@ paginate: 15
 baseurl: "/js-android-sdk"
 url: "http://jaspersoft.github.io"
 
-# Details for the RSS feed generator
-url:            'http://jaspersoft.github.io/js-android-sdk'
 author:         'Tom Koptel'
 
 safe: true
