@@ -1,0 +1,8 @@
+---
+layout: post
+title:  "JasperMobile SDK reference v1.8"
+date:   2014-12-19 15:37:00
+category: SDK
+tags: sdk
+---
+Follow JavaDocs reference <a href="/sdk-v1.8"> here</a>
