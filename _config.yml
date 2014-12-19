@@ -6,11 +6,16 @@ markdown: kramdown
 highlighter: rouge
 logo: false
 paginate: 15
-baseurl: /
+baseurl: "/js-android-sdk"
 
 # Details for the RSS feed generator
 url:            'http://jaspersoft.github.io/js-android-sdk'
 author:         'Tom Koptel'
 
+# Set the Sass partials directory, as we're using @imports
+sass:
+  sass_dir: _scss
+  style: :expanded # You might prefer to minify using :compressed
+  
 safe: true
 lsi: false
