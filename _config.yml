@@ -7,8 +7,8 @@ highlighter: rouge
 logo: false
 paginate: 15
 
-baseurl: "/js-android-sdk"
-url: "http://jaspersoft.github.io"
+baseurl: "js-android-sdk/"
+url: "http://jaspersoft.github.io/"
 
 author:         'Tom Koptel'
 
