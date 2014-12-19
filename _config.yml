@@ -2,12 +2,11 @@ name: TIBCO JasperMobile for Android SDK
 description: JasperMobile for Android SDK reference blog
 meta_description: "TIBCO JasperMobile for Android SDK notes"
 
-markdown: redcarpet
+markdown: kramdown
 highlighter: rouge
 logo: false
 paginate: 15
 baseurl: /
-domain_name: 'http://jaspersoft.github.io/js-android-sdk'
 
 # Details for the RSS feed generator
 url:            'http://jaspersoft.github.io/js-android-sdk'
