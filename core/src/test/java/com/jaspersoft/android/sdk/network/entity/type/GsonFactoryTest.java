@@ -28,6 +28,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jaspersoft.android.sdk.network.entity.dashboard.DashboardComponentCollection;
 import com.jaspersoft.android.sdk.network.entity.execution.ReportExecutionRequestOptions;
+import com.jaspersoft.android.sdk.network.entity.export.ExportComponentEntityList;
 import com.jaspersoft.android.sdk.network.entity.report.ReportParameter;
 import com.jaspersoft.android.sdk.network.entity.schedule.JobFormEntity;
 import com.jaspersoft.android.sdk.test.resource.ResourceFile;
@@ -62,6 +63,9 @@ public class GsonFactoryTest {
     TestResource mComponents;
     @ResourceFile("json/get_job.json")
     TestResource mGetJobResponse;
+    @ResourceFile("json/get_report_components.json")
+    TestResource mExportComponents;
+
 
     @Before
     public void setUp() throws Exception {
@@ -109,6 +113,13 @@ public class GsonFactoryTest {
     public void should_deserialize_form_with_custom_rule() throws Exception {
         Gson gson = GsonFactory.create();
         JobFormEntity entity = gson.fromJson(mGetJobResponse.asString(), JobFormEntity.class);
+        assertThat(entity , is(notNullValue()));
+    }
+
+    @Test
+    public void should_deserialize_export_components() throws Exception {
+        Gson gson = GsonFactory.create();
+        ExportComponentEntityList entity = gson.fromJson(mExportComponents.asString(), ExportComponentEntityList.class);
         assertThat(entity , is(notNullValue()));
     }
 }

@@ -26,19 +26,20 @@ package com.jaspersoft.android.sdk.network;
 
 import com.jaspersoft.android.sdk.network.entity.execution.ExecutionRequestOptions;
 import com.jaspersoft.android.sdk.network.entity.execution.ExecutionStatus;
-import com.jaspersoft.android.sdk.network.entity.export.ExportExecutionDescriptor;
-import com.jaspersoft.android.sdk.network.entity.export.ExportOutputResource;
-import com.jaspersoft.android.sdk.network.entity.export.OutputResource;
+import com.jaspersoft.android.sdk.network.entity.export.*;
+import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Public API that allows initiating report export request, export execution status, request export and its attachment content
- *
+ * <p/>
  * <pre>
  * {@code
  *
@@ -108,10 +109,10 @@ public class ReportExportRestApi {
     /**
      * Initiates export execution for specified report
      *
-     * @param executionId unique identifier used to associate current export with execution
+     * @param executionId      unique identifier used to associate current export with execution
      * @param executionOptions describes execution configuration metadata
      * @return details of execution invoked on server side
-     * @throws IOException if socket was closed abruptly due to network issues
+     * @throws IOException   if socket was closed abruptly due to network issues
      * @throws HttpException if rest service encountered any status code above 300
      */
     @NotNull
@@ -144,9 +145,9 @@ public class ReportExportRestApi {
      * Provides status of export execution
      *
      * @param executionId unique identifier used to identify report execution
-     * @param exportId unique identifier used to query status of export execution
+     * @param exportId    unique identifier used to query status of export execution
      * @return returns one of five states [execution, ready, cancelled, failed, queued]
-     * @throws IOException if socket was closed abruptly due to network issues
+     * @throws IOException   if socket was closed abruptly due to network issues
      * @throws HttpException if rest service encountered any status code above 300
      */
     @NotNull
@@ -179,9 +180,9 @@ public class ReportExportRestApi {
      * Provides export metadata and content as raw stream of bytes
      *
      * @param executionId unique identifier used to identify report execution
-     * @param exportId unique identifier used to query export content
+     * @param exportId    unique identifier used to query export content
      * @return resources that encapsulates metadata and raw data of export
-     * @throws IOException if socket was closed abruptly due to network issues
+     * @throws IOException   if socket was closed abruptly due to network issues
      * @throws HttpException if rest service encountered any status code above 300
      */
     @NotNull
@@ -225,11 +226,11 @@ public class ReportExportRestApi {
     /**
      * Provides attachment content as raw stream of bytes
      *
-     * @param executionId unique identifier used to identify report execution
-     * @param exportId unique identifier used to identify export execution
+     * @param executionId  unique identifier used to identify report execution
+     * @param exportId     unique identifier used to identify export execution
      * @param attachmentId filename of attachment
      * @return raw stream of attachment
-     * @throws IOException if socket was closed abruptly due to network issues
+     * @throws IOException   if socket was closed abruptly due to network issues
      * @throws HttpException if rest service encountered any status code above 300
      */
     @NotNull
@@ -259,5 +260,30 @@ public class ReportExportRestApi {
 
         com.squareup.okhttp.Response response = mNetworkClient.makeCall(request);
         return new RetrofitOutputResource(response.body());
+    }
+
+    /**
+     * TODO javadoc
+     */
+    public List<ExportComponentEntity> requestExportComponents(@NotNull String exportId,
+                                                               @NotNull String pageIndex) throws IOException, HttpException {
+        HttpUrl url = new PathResolver.Builder()
+                .addPath("getReportComponents.html")
+                .build()
+                .resolve(mNetworkClient.getBaseUrl());
+
+        FormEncodingBuilder formBody = new FormEncodingBuilder()
+                .add("jasperPrintName", exportId)
+                .add("pageIndex", pageIndex);
+
+        Request request = new Request.Builder()
+                .addHeader("Accept", "application/json; charset=UTF-8")
+                .post(formBody.build())
+                .url(url)
+                .build();
+        com.squareup.okhttp.Response response = mNetworkClient.makeCall(request);
+        ExportComponentEntityList entityList = mNetworkClient.deserializeJson(response, ExportComponentEntityList.class);
+
+        return Collections.unmodifiableList(entityList.getComponents());
     }
 }

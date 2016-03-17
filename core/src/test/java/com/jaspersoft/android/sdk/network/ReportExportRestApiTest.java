@@ -25,6 +25,7 @@
 package com.jaspersoft.android.sdk.network;
 
 import com.jaspersoft.android.sdk.network.entity.execution.ExecutionRequestOptions;
+import com.jaspersoft.android.sdk.network.entity.export.ExportComponentEntity;
 import com.jaspersoft.android.sdk.network.entity.export.ExportOutputResource;
 import com.jaspersoft.android.sdk.network.entity.export.OutputResource;
 import com.jaspersoft.android.sdk.test.MockResponseFactory;
@@ -34,17 +35,19 @@ import com.jaspersoft.android.sdk.test.resource.TestResource;
 import com.jaspersoft.android.sdk.test.resource.inject.TestResourceInjector;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.InputStream;
+import java.util.List;
 
 import static com.jaspersoft.android.sdk.test.matcher.IsRecordedRequestHasMethod.wasMethod;
 import static com.jaspersoft.android.sdk.test.matcher.IsRecordedRequestHasPath.hasPath;
 import static com.jaspersoft.android.sdk.test.matcher.IsRecorderRequestContainsHeader.containsHeader;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -65,7 +68,7 @@ public class ReportExportRestApiTest {
     private ReportExportRestApi restApiUnderTest;
 
     @ResourceFile("json/root_folder.json")
-    TestResource mResource;
+    TestResource mRootFolders;
 
     @Before
     public void setup() {
@@ -141,7 +144,7 @@ public class ReportExportRestApiTest {
         mWebMockRule.enqueue(mockResponse);
 
         ExportOutputResource resource = restApiUnderTest.requestExportOutput(EXECUTION_ID, EXPORT_ID);
-        assertThat(resource.getPages(), is("1-10"));
+        assertThat(resource.getPages(), Is.is("1-10"));
     }
 
     @Test
@@ -152,7 +155,7 @@ public class ReportExportRestApiTest {
         mWebMockRule.enqueue(mockResponse);
 
         ExportOutputResource resource = restApiUnderTest.requestExportOutput(EXECUTION_ID, EXPORT_ID);
-        assertThat(resource.isFinal(), is(true));
+        assertThat(resource.isFinal(), Is.is(true));
     }
 
     @Test
@@ -171,19 +174,19 @@ public class ReportExportRestApiTest {
     @Test
     public void requestForAttachmentShouldBeWrappedInsideInput() throws Exception {
         MockResponse mockResponse = MockResponseFactory.create200()
-                .setBody(mResource.asString());
+                .setBody(mRootFolders.asString());
         mWebMockRule.enqueue(mockResponse);
 
         OutputResource resource = restApiUnderTest.requestExportAttachment("any_id", "any_id", "any_id");
         InputStream stream = resource.getStream();
-        assertThat(stream, is(notNullValue()));
+        assertThat(stream, Is.is(notNullValue()));
         stream.close();
     }
 
     @Test
     public void shouldRequestExportAttachment() throws Exception {
         MockResponse mockResponse = MockResponseFactory.create200()
-                .setBody(mResource.asString());
+                .setBody(mRootFolders.asString());
         mWebMockRule.enqueue(mockResponse);
 
         restApiUnderTest.requestExportAttachment(EXECUTION_ID, "html;pages=1", "attachment_id");
@@ -254,5 +257,19 @@ public class ReportExportRestApiTest {
         mWebMockRule.enqueue(MockResponseFactory.create500());
 
         restApiUnderTest.requestExportAttachment("any_id", "any_id", "any_id");
+    }
+
+    @Test
+    public void shouldRequestExportComponents() throws Exception {
+        MockResponse mockResponse = MockResponseFactory.create200().setBody("{}");
+        mWebMockRule.enqueue(mockResponse);
+
+        restApiUnderTest.requestExportComponents(EXPORT_ID, "1");
+
+        RecordedRequest request = mWebMockRule.get().takeRequest();
+        assertThat(request, containsHeader("Accept", "application/json; charset=UTF-8"));
+        assertThat(request, containsHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8"));
+        assertThat(request, hasPath("/getReportComponents.html"));
+        assertThat(request, wasMethod("POST"));
     }
 }

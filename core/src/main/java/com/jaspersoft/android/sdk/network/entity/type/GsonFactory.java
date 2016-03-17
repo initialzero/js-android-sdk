@@ -41,6 +41,7 @@ public final class GsonFactory {
         gsonBuilder.registerTypeAdapterFactory(new ReportExecutionRequestOptionsFactory());
         gsonBuilder.registerTypeAdapterFactory(new DashboardComponentTypeAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new JobSourceParamsWrapperTypeAdapterFactory());
+        gsonBuilder.registerTypeAdapterFactory(new ExportComponentEntityListTypeAdapter());
         return gsonBuilder.create();
     }
 }
