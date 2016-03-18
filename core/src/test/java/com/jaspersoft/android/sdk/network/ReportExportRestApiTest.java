@@ -25,7 +25,6 @@
 package com.jaspersoft.android.sdk.network;
 
 import com.jaspersoft.android.sdk.network.entity.execution.ExecutionRequestOptions;
-import com.jaspersoft.android.sdk.network.entity.export.ExportComponentEntity;
 import com.jaspersoft.android.sdk.network.entity.export.ExportOutputResource;
 import com.jaspersoft.android.sdk.network.entity.export.OutputResource;
 import com.jaspersoft.android.sdk.test.MockResponseFactory;
@@ -42,12 +41,10 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.InputStream;
-import java.util.List;
 
 import static com.jaspersoft.android.sdk.test.matcher.IsRecordedRequestHasMethod.wasMethod;
 import static com.jaspersoft.android.sdk.test.matcher.IsRecordedRequestHasPath.hasPath;
 import static com.jaspersoft.android.sdk.test.matcher.IsRecorderRequestContainsHeader.containsHeader;
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -268,7 +265,7 @@ public class ReportExportRestApiTest {
 
         RecordedRequest request = mWebMockRule.get().takeRequest();
         assertThat(request, containsHeader("Accept", "application/json; charset=UTF-8"));
-        assertThat(request, containsHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8"));
+        assertThat(request, containsHeader("Content-Type", "application/x-www-form-urlencoded"));
         assertThat(request, hasPath("/getReportComponents.html"));
         assertThat(request, wasMethod("POST"));
     }

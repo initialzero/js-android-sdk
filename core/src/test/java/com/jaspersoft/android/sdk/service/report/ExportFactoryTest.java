@@ -72,6 +72,11 @@ public class ExportFactoryTest {
 
         when(mExportIdWrapper.getExactId()).thenReturn(EXPORT_ID);
         when(mExportIdWrapper.getServerId()).thenReturn(EXPORT_ID);
+        when(mExportIdWrapper.getOptions()).thenReturn(
+                ReportExportOptions.builder()
+                        .withFormat(ReportFormat.PDF)
+                        .build()
+        );
         when(mExportDescriptor.getId()).thenReturn(EXPORT_ID);
         when(mReportExecutionDescriptor.getExports()).thenReturn(singleton(mExportDescriptor));
     }

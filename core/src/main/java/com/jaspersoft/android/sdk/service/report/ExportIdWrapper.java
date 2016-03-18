@@ -14,6 +14,10 @@ abstract class ExportIdWrapper {
 
     public abstract String getExactId();
 
+    public ReportExportOptions getOptions() {
+        return mOptions;
+    }
+
     public final void wrap(ExportExecutionDescriptor exportDetails, ReportExportOptions options) {
         mExportDetails = exportDetails;
         mOptions = options;

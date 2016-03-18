@@ -53,6 +53,18 @@ class ExportFactory {
             throw new ServiceException("Server returned malformed export details", null, StatusCodes.EXPORT_EXECUTION_FAILED);
         }
         List<ReportAttachment> attachments = mAttachmentsFactory.create(export, execId);
+
+        ReportExportOptions options = exportIdWrapper.getOptions();
+        ReportFormat format = options.getFormat();
+        if (format == ReportFormat.HTML) {
+            return new HtmlReportExport(
+                    mExportExecutionApi,
+                    attachments,
+                    execId,
+                    exportIdWrapper.getExactId(),
+                    options.getPageRange()
+            );
+        }
         return new ReportExport(mExportExecutionApi, attachments, execId, exportIdWrapper.getExactId());
     }
 

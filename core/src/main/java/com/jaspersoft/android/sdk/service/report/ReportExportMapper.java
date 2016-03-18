@@ -24,12 +24,16 @@
 
 package com.jaspersoft.android.sdk.service.report;
 
+import com.jaspersoft.android.sdk.network.entity.export.ExportComponentEntity;
 import com.jaspersoft.android.sdk.network.entity.export.ExportOutputResource;
+import com.jaspersoft.android.sdk.service.data.report.ExportComponent;
 import com.jaspersoft.android.sdk.service.data.report.PageRange;
 import com.jaspersoft.android.sdk.service.data.report.ReportExportOutput;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Tom Koptel
@@ -53,5 +57,20 @@ class ReportExportMapper {
                 return outputResource.getOutputResource().getStream();
             }
         };
+    }
+
+    public List<ExportComponent> transform(List<ExportComponentEntity> entities) {
+        List<ExportComponent> components = new ArrayList<>(entities.size());
+        for (ExportComponentEntity entity : entities) {
+            if (entity != null) {
+                String rawType = entity.getType();
+                String id = entity.getId();
+                ExportComponent.Type type = ExportComponent.Type.parse(rawType);
+
+                ExportComponent component = new ExportComponent(id, type);
+                components.add(component);
+            }
+        }
+        return components;
     }
 }

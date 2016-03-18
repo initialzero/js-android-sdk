@@ -39,10 +39,10 @@ import java.util.List;
  * @since 2.3
  */
 public class ReportExport {
-    private final ExportExecutionApi mExportExecutionApi;
-    private final List<ReportAttachment> mAttachments;
-    private final String mExecutionId;
-    private final String mExportId;
+    protected final ExportExecutionApi mExportExecutionApi;
+    protected final List<ReportAttachment> mAttachments;
+    protected final String mExecutionId;
+    protected final String mExportId;
 
     @TestOnly
     ReportExport(ExportExecutionApi exportExecutionApi,

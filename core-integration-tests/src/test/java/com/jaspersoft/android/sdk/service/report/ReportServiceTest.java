@@ -31,7 +31,9 @@ public class ReportServiceTest {
                 .withFormat(ReportFormat.HTML)
                 .build();
 
-        ReportExport export = execution.export(exportOptions);
+        HtmlReportExport export = (HtmlReportExport) execution.export(exportOptions);
+        export.requestComponents();
+
         List<ReportAttachment> attachments = export.getAttachments();
         for (ReportAttachment reportAttachment : attachments) {
             reportAttachment.download();

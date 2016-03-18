@@ -29,9 +29,11 @@ import com.jaspersoft.android.sdk.network.ReportExportRestApi;
 import com.jaspersoft.android.sdk.network.entity.execution.ErrorDescriptor;
 import com.jaspersoft.android.sdk.network.entity.execution.ExecutionRequestOptions;
 import com.jaspersoft.android.sdk.network.entity.execution.ExecutionStatus;
+import com.jaspersoft.android.sdk.network.entity.export.ExportComponentEntity;
 import com.jaspersoft.android.sdk.network.entity.export.ExportExecutionDescriptor;
 import com.jaspersoft.android.sdk.network.entity.export.ExportOutputResource;
 import com.jaspersoft.android.sdk.network.entity.export.OutputResource;
+import com.jaspersoft.android.sdk.service.data.report.ExportComponent;
 import com.jaspersoft.android.sdk.service.data.report.ReportExportOutput;
 import com.jaspersoft.android.sdk.service.data.report.ResourceOutput;
 import com.jaspersoft.android.sdk.service.exception.ServiceException;
@@ -39,6 +41,7 @@ import com.jaspersoft.android.sdk.service.exception.StatusCodes;
 import com.jaspersoft.android.sdk.service.internal.ServiceExceptionMapper;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Tom Koptel
@@ -124,6 +127,17 @@ class ExportExecutionApi {
         } catch (HttpException e) {
             throw mExceptionMapper.transform(e);
         } catch (IOException e) {
+            throw mExceptionMapper.transform(e);
+        }
+    }
+
+    public List<ExportComponent> requestComponents(String exportId, String page) throws ServiceException {
+        try {
+            List<ExportComponentEntity> entities = mReportExportRestApi.requestExportComponents(exportId, page);
+            return mReportExportMapper.transform(entities);
+        } catch (IOException e) {
+            throw mExceptionMapper.transform(e);
+        } catch (HttpException e) {
             throw mExceptionMapper.transform(e);
         }
     }
