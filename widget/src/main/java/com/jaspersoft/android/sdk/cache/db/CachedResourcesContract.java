@@ -1,4 +1,4 @@
-package com.jaspersoft.android.sdk.sample.cache.db;
+package com.jaspersoft.android.sdk.cache.db;
 
 import android.provider.BaseColumns;
 
@@ -11,7 +11,7 @@ class CachedResourcesContract {
             "CREATE TABLE " + CacheResourcesEntry.TABLE_NAME + " (" +
                     CacheResourcesEntry._ID + " INTEGER PRIMARY KEY," +
                     CacheResourcesEntry.COLUMN_NAME_RESOURCE_URI + " TEXT NOT NULL," +
-                    CacheResourcesEntry.COLUMN_NAME_PAGE + " TEXT NOT NULL," +
+                    CacheResourcesEntry.COLUMN_NAME_PAGE + " INTEGER NOT NULL," +
                     CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH + " INTEGER," +
                     CacheResourcesEntry.COLUMN_NAME_PAGE + " TEXT NOT NULL" +
                     " )";

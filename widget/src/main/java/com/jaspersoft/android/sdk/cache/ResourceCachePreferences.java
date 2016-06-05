@@ -1,4 +1,4 @@
-package com.jaspersoft.android.sdk.sample.cache;
+package com.jaspersoft.android.sdk.cache;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

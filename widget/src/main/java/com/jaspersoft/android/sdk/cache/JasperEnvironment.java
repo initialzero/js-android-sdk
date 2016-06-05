@@ -1,4 +1,4 @@
-package com.jaspersoft.android.sdk.sample.cache;
+package com.jaspersoft.android.sdk.cache;
 
 import android.content.Context;
 
@@ -24,10 +24,10 @@ public class JasperEnvironment {
     }
 
     public void clear(Context context, AuthorizedClient client) {
-        ResourceCacheManager resourceCacheManager = new ResourceCacheManager();
+        ResourceCacheManager resourceCacheManager = new ResourceCacheManager(null, null, null, null);
     }
 
     public void clearAll(Context context) {
-        ResourceCacheManager resourceCacheManager = new ResourceCacheManager();
+        ResourceCacheManager resourceCacheManager = new ResourceCacheManager(null, null, null, null);
     }
 }

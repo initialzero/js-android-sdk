@@ -1,4 +1,4 @@
-package com.jaspersoft.android.sdk.sample.cache.db;
+package com.jaspersoft.android.sdk.cache.db;
 
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
@@ -11,12 +11,8 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 class AccountsDbHelper extends SQLiteOpenHelper {
 
-    public AccountsDbHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
-    }
-
-    public AccountsDbHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
-        super(context, name, factory, version, errorHandler);
+    public AccountsDbHelper(Context context) {
+        super(context, AccountsContract.AccountEntry.TABLE_NAME, null, AccountsContract.AccountEntry.DATABASE_VERSION);
     }
 
     @Override

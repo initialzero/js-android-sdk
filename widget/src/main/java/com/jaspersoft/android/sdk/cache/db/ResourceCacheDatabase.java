@@ -1,4 +1,4 @@
-package com.jaspersoft.android.sdk.sample.cache.db;
+package com.jaspersoft.android.sdk.cache.db;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

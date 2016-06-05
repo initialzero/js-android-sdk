@@ -1,4 +1,4 @@
-package com.jaspersoft.android.sdk.sample.cache;
+package com.jaspersoft.android.sdk.cache;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -1,9 +1,9 @@
-package com.jaspersoft.android.sdk.sample.cache;
+package com.jaspersoft.android.sdk.cache;
 
 import android.content.Context;
 
 import com.jaspersoft.android.sdk.network.AuthorizedClient;
-import com.jaspersoft.android.sdk.sample.cache.db.ResourceCacheDatabase;
+import com.jaspersoft.android.sdk.cache.db.ResourceCacheDatabase;
 
 import java.io.File;
 import java.util.UUID;
@@ -41,7 +41,7 @@ public class ResourceCacheManager {
     }
 
     public boolean deleteResourceCache(AuthorizedClient client, String resourceUri) {
-
+        return false;
     }
 
     private String generateUniqueFileName() {

@@ -1,4 +1,4 @@
-package com.jaspersoft.android.sdk.sample.cache.db;
+package com.jaspersoft.android.sdk.cache.db;
 
 import android.provider.BaseColumns;
 
@@ -20,6 +20,7 @@ class AccountsContract {
     }
 
     public abstract class AccountEntry implements BaseColumns {
+        public static final int DATABASE_VERSION = 1;
         public static final String TABLE_NAME = "accounts";
         public static final String COLUMN_NAME_USERNAME = "username";
         public static final String COLUMN_NAME_ORGANIZATION = "organization";
