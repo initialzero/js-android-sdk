@@ -9,9 +9,9 @@ import android.provider.BaseColumns;
 class AccountsContract {
     public static final String SQL_CREATE_ACCOUNTS_TABLE =
             "CREATE TABLE " + AccountEntry.TABLE_NAME + " (" +
-                    AccountEntry._ID + " INTEGER PRIMARY KEY," +
-                    AccountEntry.COLUMN_NAME_USERNAME + " TEXT NOT NULL," +
-                    AccountEntry.COLUMN_NAME_ORGANIZATION + " TEXT NOT NULL," +
+                    AccountEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    AccountEntry.COLUMN_NAME_USERNAME + " TEXT NOT NULL, " +
+                    AccountEntry.COLUMN_NAME_ORGANIZATION + " TEXT NOT NULL, " +
                     AccountEntry.COLUMN_NAME_BASE_URL + " TEXT NOT NULL" +
                     " )";
 

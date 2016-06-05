@@ -66,9 +66,6 @@ class AccountsDatabase {
     }
 
     public long addAccount(AuthorizedClient client) {
-        long accountId = getAccountId(client);
-        if (accountId != -1) return accountId;
-
         if (!(client.getCredentials() instanceof SpringCredentials)) return -1;
         SpringCredentials credentials = (SpringCredentials) client.getCredentials();
 

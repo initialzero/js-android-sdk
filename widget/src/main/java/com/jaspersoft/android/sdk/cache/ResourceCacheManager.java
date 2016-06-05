@@ -2,8 +2,8 @@ package com.jaspersoft.android.sdk.cache;
 
 import android.content.Context;
 
+import com.jaspersoft.android.sdk.cache.db.ResourceCacheDbManager;
 import com.jaspersoft.android.sdk.network.AuthorizedClient;
-import com.jaspersoft.android.sdk.cache.db.ResourceCacheDatabase;
 
 import java.io.File;
 import java.util.UUID;
@@ -15,13 +15,13 @@ import java.util.UUID;
 public class ResourceCacheManager {
 
     private final ResourceCacheStorage resourceCacheStorage;
-    private final ResourceCacheDatabase resourceCacheDatabase;
+    private final ResourceCacheDbManager resourceCacheDbManager;
     private final ResourceCachePreferences resourceCachePreferences;
     private final Context context;
 
-    public ResourceCacheManager(ResourceCacheStorage resourceCacheStorage, ResourceCacheDatabase resourceCacheDatabase, ResourceCachePreferences resourceCachePreferences, Context context) {
+    public ResourceCacheManager(ResourceCacheStorage resourceCacheStorage, ResourceCacheDbManager resourceCacheDbManager, ResourceCachePreferences resourceCachePreferences, Context context) {
         this.resourceCacheStorage = resourceCacheStorage;
-        this.resourceCacheDatabase = resourceCacheDatabase;
+        this.resourceCacheDbManager = resourceCacheDbManager;
         this.resourceCachePreferences = resourceCachePreferences;
         this.context = context;
     }

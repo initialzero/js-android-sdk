@@ -1,5 +1,6 @@
 package com.jaspersoft.android.sdk.cache.db;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
@@ -13,48 +14,42 @@ import java.util.ArrayList;
  * @author Andrew Tivodar
  * @since 2.5
  */
-public class ResourceCacheDatabase {
+class ResourceCacheDatabase {
 
-    private final AccountsDbHelper accountsDbHelper;
+    private final ResourceCacheDbHelper resourceCacheDbHelper;
 
-    public ResourceCacheDatabase(AccountsDbHelper accountsDbHelper) {
-        this.accountsDbHelper = accountsDbHelper;
+    public ResourceCacheDatabase(ResourceCacheDbHelper resourceCacheDbHelper) {
+        this.resourceCacheDbHelper = resourceCacheDbHelper;
     }
 
-    public String getCachedFileName(AuthorizedClient client, String resourceUri, int page, int filtersHash) {
-        if (!(client.getCredentials() instanceof SpringCredentials)) return null;
-        SpringCredentials credentials = (SpringCredentials) client.getCredentials();
-
-        SQLiteDatabase db = accountsDbHelper.getReadableDatabase();
-
-        SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
-        sqLiteQueryBuilder.setTables(AccountsContract.AccountEntry.TABLE_NAME + " LEFT OUTER JOIN " +
-                CachedResourcesContract.CacheResourcesEntry.TABLE_NAME + " ON (" +
-                AccountsContract.AccountEntry.TABLE_NAME + "." + AccountsContract.AccountEntry._ID +
-                " = " +
-                CachedResourcesContract.CacheResourcesEntry.TABLE_NAME + "." + CachedResourcesContract.CacheResourcesEntry._ID +
-                ")");
+    public String getCachedFileName(long accountId, String resourceUri, int page, int filtersHash) {
+        SQLiteDatabase db = resourceCacheDbHelper.getReadableDatabase();
 
         StringBuilder selection = new StringBuilder("");
         ArrayList<String> selectionArgs = new ArrayList<String>();
 
-        //Add username to WHERE params
-        selection.append(AccountsContract.AccountEntry.TABLE_NAME + "." + AccountsContract.AccountEntry.COLUMN_NAME_USERNAME + " =?");
-        selectionArgs.add(credentials.getUsername());
+        //Add accountId to WHERE params
+        selection.append(ResourceCachedContract.CacheResourcesEntry._ID + " =?");
+        selectionArgs.add(String.valueOf(accountId));
 
-        //Add organization to WHERE params
+        //Add resourceUri to WHERE params
         selection.append(" AND ");
-        selection.append(AccountsContract.AccountEntry.TABLE_NAME + "." + AccountsContract.AccountEntry.COLUMN_NAME_ORGANIZATION + " =?");
-        selectionArgs.add(credentials.getOrganization());
+        selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_RESOURCE_URI + " =?");
+        selectionArgs.add(resourceUri);
 
-        //Add baseUrl to WHERE params
+        //Add page to WHERE params
         selection.append(" AND ");
-        selection.append(AccountsContract.AccountEntry.TABLE_NAME + "." + AccountsContract.AccountEntry.COLUMN_NAME_BASE_URL + " =?");
-        selectionArgs.add(client.getBaseUrl());
+        selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_PAGE + " =?");
+        selectionArgs.add(String.valueOf(page));
 
-        Cursor accountCursor = sqLiteQueryBuilder.query(
-                db,
-                new String[]{CachedResourcesContract.CacheResourcesEntry.COLUMN_NAME_FILEPATH},
+        //Add filterHash to WHERE params
+        selection.append(" AND ");
+        selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH + " =?");
+        selectionArgs.add(String.valueOf(filtersHash));
+
+        Cursor cacheCursor = db.query(
+                ResourceCachedContract.CacheResourcesEntry.TABLE_NAME,
+                new String[]{ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILEPATH},
                 selection.toString(),
                 selectionArgs.toArray(new String[selectionArgs.size()]),
                 null,
@@ -62,14 +57,30 @@ public class ResourceCacheDatabase {
                 null
         );
 
-        String fileName = null;
-        if (accountCursor != null) {
-            if (accountCursor.moveToFirst()) {
-                fileName = accountCursor.getString(accountCursor.getColumnIndex(CachedResourcesContract.CacheResourcesEntry.COLUMN_NAME_FILEPATH));
+        String filePath = null;
+        if (cacheCursor != null) {
+            if (cacheCursor.moveToFirst()) {
+                filePath = cacheCursor.getString(cacheCursor.getColumnIndex(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILEPATH));
             }
-            accountCursor.close();
+            cacheCursor.close();
         }
         db.close();
-        return fileName;
+        return filePath;
+    }
+
+    public boolean addResourceCache(long accountId, String resourceUri, int page, int filtersHash, String filepath) {
+        SQLiteDatabase db = resourceCacheDbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(ResourceCachedContract.CacheResourcesEntry._ID, accountId);
+        values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_RESOURCE_URI, resourceUri);
+        values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_PAGE, page);
+        values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH, filtersHash);
+        values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILEPATH, filepath);
+
+        return db.insert(
+                ResourceCachedContract.CacheResourcesEntry.TABLE_NAME,
+                null,
+                values) != -1;
     }
 }
