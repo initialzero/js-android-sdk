@@ -42,7 +42,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.File;
-import java.io.InputStream;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.CoreMatchers.is;
@@ -103,6 +102,22 @@ public class AccountsTableTest {
         long accountId = accountsDatabase.getAccountId(authorizedClient);
 
         assertThat(accountId, is(2L));
+    }
+
+    @Test
+    public void should_not_get_account() throws Exception {
+        SpringCredentials springCredentials = SpringCredentials.builder()
+                .withUsername("wrong")
+                .withOrganization("wrong")
+                .withPassword("empty")
+                .build();
+
+        when(authorizedClient.getCredentials()).thenReturn(springCredentials);
+        when(authorizedClient.getBaseUrl()).thenReturn("http://wrong.com/test");
+
+        long accountId = accountsDatabase.getAccountId(authorizedClient);
+
+        assertThat(accountId, is(-1L));
     }
 
     @After

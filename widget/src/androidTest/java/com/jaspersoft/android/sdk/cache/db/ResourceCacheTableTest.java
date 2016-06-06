@@ -31,7 +31,6 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.jaspersoft.android.sdk.network.AuthorizedClient;
 import com.jaspersoft.android.sdk.network.Credentials;
-import com.jaspersoft.android.sdk.network.SpringCredentials;
 import com.jaspersoft.android.sdk.utils.DbImporter;
 
 import org.junit.After;
@@ -46,7 +45,6 @@ import java.io.File;
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
@@ -58,8 +56,8 @@ public class ResourceCacheTableTest {
     @Mock
     Credentials credentials;
 
-    private AccountsDatabase accountsDatabase;
-    private AccountsDbHelper accountsDbHelper;
+    private ResourceCacheDbHelper resourceCacheDbHelper;
+    private ResourceCacheDatabase resourceCacheDatabase;
 
     @Before
     public void setUp() throws Exception {
@@ -68,51 +66,101 @@ public class ResourceCacheTableTest {
         authorizedClient = Mockito.mock(AuthorizedClient.class);
         credentials = Mockito.mock(Credentials.class);
 
-        accountsDbHelper = new FakeAccountsDbHelper(getInstrumentation().getTargetContext());
-        accountsDatabase = new AccountsDatabase(accountsDbHelper);
+        resourceCacheDbHelper = new FakeResourceCacheDbHelper(getInstrumentation().getTargetContext());
+        resourceCacheDatabase = new ResourceCacheDatabase(resourceCacheDbHelper);
     }
 
     @Test
-    public void should_add_account() throws Exception {
-        SpringCredentials springCredentials = SpringCredentials.builder()
-                .withUsername("testUserName")
-                .withOrganization("testOrganization")
-                .withPassword("empty")
-                .build();
+    public void should_cache_resource() throws Exception {
+        boolean added = resourceCacheDatabase.addResourceCache(2L,
+                "http://test-url.com/report",
+                551525125,
+                3,
+                "512t2fg");
 
-        when(authorizedClient.getCredentials()).thenReturn(springCredentials);
-        when(authorizedClient.getBaseUrl()).thenReturn("http://test-url.com/test");
-
-        long accountId = accountsDatabase.addAccount(authorizedClient);
-
-        assertThat(accountId, is(4L));
+        assertThat(added, is(true));
     }
 
     @Test
-    public void should_get_account() throws Exception {
-        SpringCredentials springCredentials = SpringCredentials.builder()
-                .withUsername("test_user_b")
-                .withOrganization("test_org_b")
-                .withPassword("empty")
-                .build();
+    public void should_cache_resource_without_filters() throws Exception {
+        boolean added = resourceCacheDatabase.addResourceCache(3L,
+                "http://test-url.com/report2",
+                0,
+                3,
+                "512t2fg");
 
-        when(authorizedClient.getCredentials()).thenReturn(springCredentials);
-        when(authorizedClient.getBaseUrl()).thenReturn("http://test-url-b.com/test");
+        assertThat(added, is(true));
+    }
 
-        long accountId = accountsDatabase.getAccountId(authorizedClient);
+    @Test
+    public void should_get_cached_resource() throws Exception {
+        String cachedFile = resourceCacheDatabase.getCachedFileName(2L,
+                "http://server-b.com/report2",
+                538592935,
+                1);
 
-        assertThat(accountId, is(2L));
+        assertThat(cachedFile, is("330f5118-89c7-4c81-9ce2-aeb747bb6c69"));
+    }
+
+    @Test
+    public void should_get_cached_resource_without_filter_hash() throws Exception {
+        String cachedFile = resourceCacheDatabase.getCachedFileName(2L,
+                "http://server-b.com/report",
+                0,
+                44);
+
+        assertThat(cachedFile, is("82d0c8fb-cdd2-46ae-a75f-a13f2a678a31"));
+    }
+
+    @Test
+    public void should_not_get_cached_resource() throws Exception {
+        String cachedFile = resourceCacheDatabase.getCachedFileName(10L,
+                "http://WRONG.com/wrong",
+                538592935,
+                1);
+
+        assertThat(cachedFile, is((String) null));
+    }
+
+    @Test
+    public void should_remove_cached_resource() throws Exception {
+        int removed = resourceCacheDatabase.deleteResourceCache(2L,
+                "http://server-b.com/report2",
+                538592935,
+                1);
+
+        assertThat(removed, is(1));
+    }
+
+    @Test
+    public void should_remove_all_cached_page() throws Exception {
+        int removed = resourceCacheDatabase.deleteResourceCache(1L,
+                "http://server-a.com/report",
+                634732353,
+                null);
+
+        assertThat(removed, is(2));
+    }
+
+    @Test
+    public void should_not_remove_cached_resource() throws Exception {
+        int removed = resourceCacheDatabase.deleteResourceCache(10L,
+                "http://WRONG.com/wrong",
+                538592935,
+                1);
+
+        assertThat(removed, is(0));
     }
 
     @After
     public void close() {
-        accountsDbHelper.close();
-        ((FakeAccountsDbHelper) accountsDbHelper).dropDb();
+        resourceCacheDbHelper.close();
+        ((FakeResourceCacheDbHelper) resourceCacheDbHelper).dropDb();
     }
 
-    private final class FakeAccountsDbHelper extends AccountsDbHelper {
+    private final class FakeResourceCacheDbHelper extends ResourceCacheDbHelper {
 
-        public FakeAccountsDbHelper(Context context) {
+        public FakeResourceCacheDbHelper(Context context) {
             super(context);
         }
 

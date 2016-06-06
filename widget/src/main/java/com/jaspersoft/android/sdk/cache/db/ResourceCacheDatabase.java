@@ -3,10 +3,9 @@ package com.jaspersoft.android.sdk.cache.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 
-import com.jaspersoft.android.sdk.network.AuthorizedClient;
-import com.jaspersoft.android.sdk.network.SpringCredentials;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -22,7 +21,7 @@ class ResourceCacheDatabase {
         this.resourceCacheDbHelper = resourceCacheDbHelper;
     }
 
-    public String getCachedFileName(long accountId, String resourceUri, int page, int filtersHash) {
+    public String getCachedFileName(@NotNull Long accountId, @NotNull String resourceUri, @NotNull Integer filtersHash, @Nullable Integer page) {
         SQLiteDatabase db = resourceCacheDbHelper.getReadableDatabase();
 
         StringBuilder selection = new StringBuilder("");
@@ -37,15 +36,17 @@ class ResourceCacheDatabase {
         selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_RESOURCE_URI + " =?");
         selectionArgs.add(resourceUri);
 
+        if (filtersHash != 0) {
+            //Add filterHash to WHERE params
+            selection.append(" AND ");
+            selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH + " =?");
+            selectionArgs.add(String.valueOf(filtersHash));
+        }
+
         //Add page to WHERE params
         selection.append(" AND ");
         selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_PAGE + " =?");
         selectionArgs.add(String.valueOf(page));
-
-        //Add filterHash to WHERE params
-        selection.append(" AND ");
-        selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH + " =?");
-        selectionArgs.add(String.valueOf(filtersHash));
 
         Cursor cacheCursor = db.query(
                 ResourceCachedContract.CacheResourcesEntry.TABLE_NAME,
@@ -68,7 +69,7 @@ class ResourceCacheDatabase {
         return filePath;
     }
 
-    public boolean addResourceCache(long accountId, String resourceUri, int page, int filtersHash, String filepath) {
+    public boolean addResourceCache(@NotNull Long accountId, @NotNull String resourceUri, @NotNull Integer filtersHash, @Nullable Integer page, @NotNull String filepath) {
         SQLiteDatabase db = resourceCacheDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -78,9 +79,46 @@ class ResourceCacheDatabase {
         values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH, filtersHash);
         values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILEPATH, filepath);
 
-        return db.insert(
+        boolean inserted = db.insert(
                 ResourceCachedContract.CacheResourcesEntry.TABLE_NAME,
                 null,
                 values) != -1;
+        db.close();
+        return inserted;
+    }
+
+    public int deleteResourceCache(@NotNull Long accountId, @NotNull String resourceUri, @NotNull Integer filtersHash, @Nullable Integer page) {
+        SQLiteDatabase db = resourceCacheDbHelper.getWritableDatabase();
+
+        StringBuilder selection = new StringBuilder("");
+        ArrayList<String> selectionArgs = new ArrayList<String>();
+
+        //Add accountId to WHERE params
+        selection.append(ResourceCachedContract.CacheResourcesEntry._ID + " =?");
+        selectionArgs.add(String.valueOf(accountId));
+
+        //Add resourceUri to WHERE params
+        selection.append(" AND ");
+        selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_RESOURCE_URI + " =?");
+        selectionArgs.add(resourceUri);
+
+        //Add filterHash to WHERE params
+        selection.append(" AND ");
+        selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH + " =?");
+        selectionArgs.add(String.valueOf(filtersHash));
+
+        if (page != null) {
+            //Add page to WHERE params
+            selection.append(" AND ");
+            selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_PAGE + " =?");
+            selectionArgs.add(String.valueOf(page));
+        }
+
+        int deleted = db.delete(
+                ResourceCachedContract.CacheResourcesEntry.TABLE_NAME,
+                selection.toString(),
+                selectionArgs.toArray(new String[selectionArgs.size()]));
+        db.close();
+        return deleted;
     }
 }

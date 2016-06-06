@@ -12,7 +12,7 @@ class ResourceCachedContract {
                     CacheResourcesEntry._ID + " INTEGER NOT NULL, " +
                     CacheResourcesEntry.COLUMN_NAME_RESOURCE_URI + " TEXT NOT NULL, " +
                     CacheResourcesEntry.COLUMN_NAME_PAGE + " INTEGER NOT NULL, " +
-                    CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH + " INTEGER, " +
+                    CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH + " INTEGER NOT NULL, " +
                     CacheResourcesEntry.COLUMN_NAME_FILEPATH + " TEXT NOT NULL" +
                     " )";
 
