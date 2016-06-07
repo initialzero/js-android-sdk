@@ -13,11 +13,11 @@ import java.util.ArrayList;
  * @author Andrew Tivodar
  * @since 2.5
  */
-class ResourceCacheDatabase {
+class ResourceCacheTable {
 
     private final ResourceCacheDbHelper resourceCacheDbHelper;
 
-    public ResourceCacheDatabase(ResourceCacheDbHelper resourceCacheDbHelper) {
+    public ResourceCacheTable(ResourceCacheDbHelper resourceCacheDbHelper) {
         this.resourceCacheDbHelper = resourceCacheDbHelper;
     }
 
@@ -28,7 +28,7 @@ class ResourceCacheDatabase {
         ArrayList<String> selectionArgs = new ArrayList<String>();
 
         //Add accountId to WHERE params
-        selection.append(ResourceCachedContract.CacheResourcesEntry._ID + " =?");
+        selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_ACCOUNT_ID + " =?");
         selectionArgs.add(String.valueOf(accountId));
 
         //Add resourceUri to WHERE params
@@ -73,7 +73,7 @@ class ResourceCacheDatabase {
         SQLiteDatabase db = resourceCacheDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(ResourceCachedContract.CacheResourcesEntry._ID, accountId);
+        values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_ACCOUNT_ID, accountId);
         values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_RESOURCE_URI, resourceUri);
         values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_PAGE, page);
         values.put(ResourceCachedContract.CacheResourcesEntry.COLUMN_NAME_FILTERS_HASH, filtersHash);
@@ -94,7 +94,7 @@ class ResourceCacheDatabase {
         ArrayList<String> selectionArgs = new ArrayList<String>();
 
         //Add accountId to WHERE params
-        selection.append(ResourceCachedContract.CacheResourcesEntry._ID + " =?");
+        selection.append(ResourceCachedContract.CacheResourcesEntry.COLUMN_ACCOUNT_ID + " =?");
         selectionArgs.add(String.valueOf(accountId));
 
         //Add resourceUri to WHERE params

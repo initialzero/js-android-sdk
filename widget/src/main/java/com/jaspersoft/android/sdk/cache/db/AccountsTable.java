@@ -13,11 +13,11 @@ import java.util.ArrayList;
  * @author Andrew Tivodar
  * @since 2.5
  */
-class AccountsDatabase {
+class AccountsTable {
 
     private final AccountsDbHelper accountsDbHelper;
 
-    public AccountsDatabase(AccountsDbHelper accountsDbHelper) {
+    public AccountsTable(AccountsDbHelper accountsDbHelper) {
         this.accountsDbHelper = accountsDbHelper;
     }
 
@@ -80,5 +80,37 @@ class AccountsDatabase {
                 AccountsContract.AccountEntry.TABLE_NAME,
                 null,
                 values);
+    }
+
+    public boolean removeAccount(AuthorizedClient client) {
+        if (!(client.getCredentials() instanceof SpringCredentials)) return false;
+        SpringCredentials credentials = (SpringCredentials) client.getCredentials();
+
+        SQLiteDatabase db = accountsDbHelper.getReadableDatabase();
+
+        StringBuilder selection = new StringBuilder("");
+        ArrayList<String> selectionArgs = new ArrayList<>();
+
+        //Add username to WHERE params
+        selection.append(AccountsContract.AccountEntry.COLUMN_NAME_USERNAME + " =?");
+        selectionArgs.add(credentials.getUsername());
+
+        //Add organization to WHERE params
+        selection.append(" AND ");
+        selection.append(AccountsContract.AccountEntry.COLUMN_NAME_ORGANIZATION + " =?");
+        selectionArgs.add(credentials.getOrganization());
+
+        //Add baseUrl to WHERE params
+        selection.append(" AND ");
+        selection.append(AccountsContract.AccountEntry.COLUMN_NAME_BASE_URL + " =?");
+        selectionArgs.add(client.getBaseUrl());
+
+        int removed = db.delete(
+                AccountsContract.AccountEntry.TABLE_NAME,
+                selection.toString(),
+                selectionArgs.toArray(new String[selectionArgs.size()])
+        );
+
+        return removed != 0;
     }
 }

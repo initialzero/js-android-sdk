@@ -29,20 +29,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.jaspersoft.android.sdk.network.AuthorizedClient;
-import com.jaspersoft.android.sdk.network.Credentials;
 import com.jaspersoft.android.sdk.utils.DbImporter;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
 import java.io.File;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
+import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -50,29 +47,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @SmallTest
 public class ResourceCacheTableTest {
 
-    @Mock
-    AuthorizedClient authorizedClient;
-
-    @Mock
-    Credentials credentials;
-
     private ResourceCacheDbHelper resourceCacheDbHelper;
-    private ResourceCacheDatabase resourceCacheDatabase;
+    private ResourceCacheTable resourceCacheTable;
 
     @Before
     public void setUp() throws Exception {
         //TODO: change with  initMocks(this); after new dexmaker-mockito release
-        System.setProperty("dexmaker.dexcache", getInstrumentation().getTargetContext().getApplicationContext().getCacheDir().getPath());
-        authorizedClient = Mockito.mock(AuthorizedClient.class);
-        credentials = Mockito.mock(Credentials.class);
+        System.setProperty("dexmaker.dexcache", getTargetContext().getApplicationContext().getCacheDir().getPath());
 
         resourceCacheDbHelper = new FakeResourceCacheDbHelper(getInstrumentation().getTargetContext());
-        resourceCacheDatabase = new ResourceCacheDatabase(resourceCacheDbHelper);
+        resourceCacheTable = new ResourceCacheTable(resourceCacheDbHelper);
     }
 
     @Test
     public void should_cache_resource() throws Exception {
-        boolean added = resourceCacheDatabase.addResourceCache(2L,
+        boolean added = resourceCacheTable.addResourceCache(2L,
                 "http://test-url.com/report",
                 551525125,
                 3,
@@ -83,7 +72,7 @@ public class ResourceCacheTableTest {
 
     @Test
     public void should_cache_resource_without_filters() throws Exception {
-        boolean added = resourceCacheDatabase.addResourceCache(3L,
+        boolean added = resourceCacheTable.addResourceCache(3L,
                 "http://test-url.com/report2",
                 0,
                 3,
@@ -94,7 +83,7 @@ public class ResourceCacheTableTest {
 
     @Test
     public void should_get_cached_resource() throws Exception {
-        String cachedFile = resourceCacheDatabase.getCachedFileName(2L,
+        String cachedFile = resourceCacheTable.getCachedFileName(2L,
                 "http://server-b.com/report2",
                 538592935,
                 1);
@@ -104,7 +93,7 @@ public class ResourceCacheTableTest {
 
     @Test
     public void should_get_cached_resource_without_filter_hash() throws Exception {
-        String cachedFile = resourceCacheDatabase.getCachedFileName(2L,
+        String cachedFile = resourceCacheTable.getCachedFileName(2L,
                 "http://server-b.com/report",
                 0,
                 44);
@@ -114,7 +103,7 @@ public class ResourceCacheTableTest {
 
     @Test
     public void should_not_get_cached_resource() throws Exception {
-        String cachedFile = resourceCacheDatabase.getCachedFileName(10L,
+        String cachedFile = resourceCacheTable.getCachedFileName(10L,
                 "http://WRONG.com/wrong",
                 538592935,
                 1);
@@ -124,7 +113,7 @@ public class ResourceCacheTableTest {
 
     @Test
     public void should_remove_cached_resource() throws Exception {
-        int removed = resourceCacheDatabase.deleteResourceCache(2L,
+        int removed = resourceCacheTable.deleteResourceCache(2L,
                 "http://server-b.com/report2",
                 538592935,
                 1);
@@ -134,7 +123,7 @@ public class ResourceCacheTableTest {
 
     @Test
     public void should_remove_all_cached_page() throws Exception {
-        int removed = resourceCacheDatabase.deleteResourceCache(1L,
+        int removed = resourceCacheTable.deleteResourceCache(1L,
                 "http://server-a.com/report",
                 634732353,
                 null);
@@ -144,7 +133,7 @@ public class ResourceCacheTableTest {
 
     @Test
     public void should_not_remove_cached_resource() throws Exception {
-        int removed = resourceCacheDatabase.deleteResourceCache(10L,
+        int removed = resourceCacheTable.deleteResourceCache(10L,
                 "http://WRONG.com/wrong",
                 538592935,
                 1);
@@ -160,23 +149,23 @@ public class ResourceCacheTableTest {
 
     private final class FakeResourceCacheDbHelper extends ResourceCacheDbHelper {
 
+        private final SQLiteDatabase sqLiteDb;
+
         public FakeResourceCacheDbHelper(Context context) {
             super(context);
+
+            File fakeDbFile = DbImporter.importDb("accounts", getInstrumentation().getTargetContext().getExternalCacheDir(), "accounts.sqlite");
+            sqLiteDb = SQLiteDatabase.openDatabase(fakeDbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
         }
 
         @Override
         public SQLiteDatabase getReadableDatabase() {
-            return getFakeBd();
+            return sqLiteDb;
         }
 
         @Override
         public SQLiteDatabase getWritableDatabase() {
-            return getFakeBd();
-        }
-
-        private SQLiteDatabase getFakeBd() {
-            File fakeDbFile = DbImporter.importDb("accounts", getInstrumentation().getTargetContext().getExternalCacheDir(), "accounts.sqlite");
-            return SQLiteDatabase.openDatabase(fakeDbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
+            return sqLiteDb;
         }
 
         public void dropDb() {

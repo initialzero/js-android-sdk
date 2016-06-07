@@ -4,35 +4,47 @@ import android.content.Context;
 
 import com.jaspersoft.android.sdk.network.AuthorizedClient;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * @author Andrew Tivodar
  * @since 2.5
  */
 public class ResourceCacheDbManager {
 
-    private final AccountsDatabase accountsDatabase;
-    private final ResourceCacheDatabase resourceCacheDatabase;
+    private final AccountsTable accountsTable;
+    private final ResourceCacheTable resourceCacheTable;
 
-    ResourceCacheDbManager(AccountsDatabase accountsDatabase, ResourceCacheDatabase resourceCacheDatabase) {
-        this.accountsDatabase = accountsDatabase;
-        this.resourceCacheDatabase = resourceCacheDatabase;
+    ResourceCacheDbManager(AccountsTable accountsTable, ResourceCacheTable resourceCacheTable) {
+        this.accountsTable = accountsTable;
+        this.resourceCacheTable = resourceCacheTable;
     }
 
     public String getCachedFile(AuthorizedClient client, String resourceUri, int page, int filtersHash) {
-        long accountId = accountsDatabase.getAccountId(client);
+        long accountId = accountsTable.getAccountId(client);
         if (accountId == -1) return null;
 
-        return resourceCacheDatabase.getCachedFileName(accountId, resourceUri, page, filtersHash);
+        return resourceCacheTable.getCachedFileName(accountId, resourceUri, page, filtersHash);
     }
 
     public boolean addResourceCache(AuthorizedClient client, String resourceUri, int page, int filtersHash, String filepath) {
-        long accountId = accountsDatabase.getAccountId(client);
+        long accountId = accountsTable.getAccountId(client);
         if (accountId == -1) {
-            accountId = accountsDatabase.addAccount(client);
+            accountId = accountsTable.addAccount(client);
         }
 
-        return resourceCacheDatabase.getCachedFileName(accountId, resourceUri, page, filtersHash) == null
-                || resourceCacheDatabase.addResourceCache(accountId, resourceUri, page, filtersHash, filepath);
+        return resourceCacheTable.getCachedFileName(accountId, resourceUri, page, filtersHash) == null
+                || resourceCacheTable.addResourceCache(accountId, resourceUri, page, filtersHash, filepath);
+    }
+
+    public boolean deleteResourceCache(AuthorizedClient client) {
+        return accountsTable.removeAccount(client);
+    }
+
+    public boolean deleteResourceCache(@NotNull AuthorizedClient client, @NotNull String resourceUri, @NotNull Integer filtersHash, @Nullable Integer page) {
+        long accountId = accountsTable.getAccountId(client);
+        return accountId != -1 && resourceCacheTable.deleteResourceCache(accountId, resourceUri, filtersHash, page) != 0;
     }
 
     public static class Builder {
@@ -44,9 +56,9 @@ public class ResourceCacheDbManager {
         }
 
         public ResourceCacheDbManager build() {
-            AccountsDatabase accountsDatabase = new AccountsDatabase(new AccountsDbHelper(context));
-            ResourceCacheDatabase resourceCacheDatabase = new ResourceCacheDatabase(new ResourceCacheDbHelper(context));
-            return new ResourceCacheDbManager(accountsDatabase, resourceCacheDatabase);
+            AccountsTable accountsTable = new AccountsTable(new AccountsDbHelper(context));
+            ResourceCacheTable resourceCacheTable = new ResourceCacheTable(new ResourceCacheDbHelper(context));
+            return new ResourceCacheDbManager(accountsTable, resourceCacheTable);
         }
     }
 }
