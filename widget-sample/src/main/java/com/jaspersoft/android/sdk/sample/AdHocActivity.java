@@ -47,10 +47,10 @@ public class AdHocActivity extends AppCompatActivity implements LegendBottomDial
                 return true;
             case R.id.chartType:
                 ChartType chartType = adHocView.getChartType();
-                if (chartType == ChartType.COLUMN) {
-                    adHocView.setChartType(ChartType.LINE);
-                } else {
+                if (chartType == ChartType.LINE) {
                     adHocView.setChartType(ChartType.COLUMN);
+                } else {
+                    adHocView.setChartType(ChartType.LINE);
                 }
                 return true;
             default:

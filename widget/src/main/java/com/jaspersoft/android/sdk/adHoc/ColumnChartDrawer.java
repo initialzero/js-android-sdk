@@ -2,17 +2,21 @@ package com.jaspersoft.android.sdk.adHoc;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.jaspersoft.android.sdk.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +29,7 @@ public class ColumnChartDrawer implements ChartDrawer {
 
     private Context context;
     private List<Integer> barColors;
+    private BarChart barChart;
 
     public ColumnChartDrawer(Context context) {
         barColors = new ArrayList<>();
@@ -37,7 +42,7 @@ public class ColumnChartDrawer implements ChartDrawer {
 
     @Override
     public Chart draw(List<List<Entry>> data, List<String> measures, List<String> groups) {
-        BarChart barChart = createBarChart(context);
+        barChart = createBarChart(context);
         defineAxis(barChart);
         setChartData(barChart, data, measures, groups);
         return barChart;
@@ -50,6 +55,8 @@ public class ColumnChartDrawer implements ChartDrawer {
         barChart.setDoubleTapToZoomEnabled(false);
         barChart.animateY(500);
         barChart.setKeepPositionOnRotation(true);
+
+        barChart.setMarkerView(new PopupView(context));
 
         Legend legend = barChart.getLegend();
         legend.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
@@ -102,5 +109,30 @@ public class ColumnChartDrawer implements ChartDrawer {
             barEntries.add((BarEntry) entry);
         }
         return barEntries;
+    }
+
+    private class PopupView extends MarkerView {
+
+        private TextView tvContent;
+
+        public PopupView(Context context) {
+            super(context, R.layout.view_popup);
+            tvContent = (TextView) findViewById(R.id.popupText);
+        }
+
+        @Override
+        public void refreshContent(Entry e, Highlight highlight) {
+            tvContent.setText(barChart.getXValue(highlight.getXIndex()) + "\n" + barChart.getData().getDataSetByIndex(highlight.getDataSetIndex()).getLabel() + ": " + e.getVal());
+        }
+
+        @Override
+        public int getXOffset(float xpos) {
+            return -(getWidth() / 2);
+        }
+
+        @Override
+        public int getYOffset(float ypos) {
+            return -getHeight();
+        }
     }
 }

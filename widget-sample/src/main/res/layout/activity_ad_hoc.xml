@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.jaspersoft.android.sdk.adHoc.AdHocView
+    <com.jaspersoft.android.sdk.adHoc.table.TableAdHocView
         android:id="@+id/adHoc"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
