@@ -16,14 +16,14 @@ import java.util.List;
  * @author Andrew Tivodar
  * @since 2.5
  */
-public class AdHocActivity extends AppCompatActivity implements LegendBottomDialogFragment.LegendUpdateListener {
+public class AdHocChartActivity extends AppCompatActivity implements LegendBottomDialogFragment.LegendUpdateListener {
 
     AdHocView adHocView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ad_hoc);
+        setContentView(R.layout.activity_ad_hoc_chart);
 
         adHocView = (AdHocView) findViewById(R.id.adHoc);
         adHocView.run(null, null);
